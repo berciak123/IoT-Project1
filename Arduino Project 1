@@ -1,58 +1,53 @@
-
-/*
-    Hello World.ino
-    2013 Copyright (c) Seeed Technology Inc.  All right reserved.
-
-    Author:Loovee
-    2013-9-18
-
-    Grove - Serial LCD RGB Backlight demo.
-
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
-
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
-
-#include <Wire.h>
+#include <Wire.h> // For I2C communication
 #include "rgb_lcd.h"
-#define PIN_SLIDE_POT_A A0
 
 rgb_lcd lcd;
 
-const int colorR = 255;
-const int colorG = 0;
-const int colorB = 0;
+int colorR = 0;
+int colorG = 0;
+int colorB = 255;
 
 void setup() {
-    // set up the LCD's number of columns and rows:
-    lcd.begin(16, 2);
+// Print something
+lcd.setCursor(0, 0);
+lcd.print("Tire Thread Guage");
+lcd.setCursor(2, 1);
+lcd.print("IoT Project");
+delay(1000);
+lcd.clear();
 
-    lcd.setRGB(colorR, colorG, colorB);
-
-    delay(1000);
-
-    Serial.begin(9600);
-  pinMode(PIN_SLIDE_POT_A, INPUT );
+Serial.begin(115200);
+pinMode(A0, INPUT);
 }
 
 void loop() {
-    int value_slide_pot_a = analogRead(PIN_SLIDE_POT_A);
-  Serial.print("Slide Pot value: ");
-  Serial.println(value_slide_pot_a);
-  lcd.setCursor(1,0);
-  lcd.println(value_slide_pot_a);
+// put your main code here, to run repeatedly:
+double value = analogRead(A0);// line reads analogue value
+value = value / 100;//devides the value to display mm
+Serial.print("Slide Pot value: ");
+Serial.println(value);
+lcd.setCursor(4, 0);
+lcd.print(value);
+lcd.print("mm");
+if (value < 2)//Tire pressure low
+{
+  int colorR = 255;
+  int colorG = 0;
+  int colorB = 0;
+  lcd.print("Tire Thread Too Low");
+//i want this screen to be red
 }
-
-/*********************************************************************************************************
-    END FILE
-*********************************************************************************************************/
+else if (value >=2 && value < 4)//Tire pressure medium
+{
+//this one should be yellow
+}
+else//Tire pressure Perfect
+{
+  int colorR = 0;
+  int colorG = 255;
+  int colorB = 0;
+  lcd.print("Tire Thread Too Low");
+//finally this should be green
+}
+delay(100);//delays the Project so it doesnt overheat
+}
